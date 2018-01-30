@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+    <flow name="sftpconnectorFlow">
+        <sftp:inbound-endpoint host="localhost" port="2222" path="/input" user="crushadmin" password="crushadmin" responseTimeout="10000" doc:name="SFTP"/>
+        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <logger message="Filedata: #[payload]" level="INFO" doc:name="Logger"/>
+        <json:xml-to-json-transformer doc:name="XML to JSON"/>
+        <logger message="File data to be written #[payload]" level="INFO" doc:name="Logger"/>
+        <sftp:outbound-endpoint exchange-pattern="one-way" outputPattern="#[message.inboundProperties.originalFilename+&quot;&quot;+java.util.UUID.randomUUID()+&quot;.json&quot;]" host="localhost" port="2222" path="/output" user="crushadmin" password="crushadmin" responseTimeout="10000" doc:name="SFTP"/>
+    </flow>
+</mule>
